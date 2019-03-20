@@ -217,6 +217,10 @@ for epoch in range(dict1['epoch'] + 1, args.epochs):
     valLoss.append([])
     valPSNR.append([])
     iLoss = 0
+    iRecnLoss = 0
+    iWarpLoss = 0
+    iPrcpLoss = 0
+    iSmoothLoss = 0
     
     # Increment scheduler count    
     scheduler.step()
@@ -287,6 +291,10 @@ for epoch in range(dict1['epoch'] + 1, args.epochs):
         loss.backward()
         optimizer.step()
         iLoss += loss.item()
+        iRecnLoss += recnLoss.item()
+        iWarpLoss += warpLoss.item()
+        iPrcpLoss += prcpLoss.item()
+        iSmoothLoss += loss_smooth.item()
                
         # Validation and progress every `args.progress_iter` iterations
         if ((trainIndex % args.progress_iter) == args.progress_iter - 1):
@@ -301,7 +309,11 @@ for epoch in range(dict1['epoch'] + 1, args.epochs):
             itr = trainIndex + epoch * (len(trainloader))
             
             writer.add_scalars('Loss', {'trainLoss': iLoss/args.progress_iter,
-                                        'validationLoss': vLoss}, itr)
+                                        'validationLoss': vLoss, 
+                                        'recnLoss': iRecnLoss/args.progress_iter,
+                                        'warpLoss': iWarpLoss/args.progress_iter, 
+                                        'prcpLoss': iPrcpLoss/args.progress_iter,
+                                        'smoothLoss': iSmoothLoss/args.progress_iter}, itr)
             writer.add_scalar('PSNR', psnr, itr)
             
             writer.add_image('Validation',valImg , itr)
